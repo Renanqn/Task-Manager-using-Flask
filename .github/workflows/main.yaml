@@ -95,30 +95,30 @@ jobs:
           name: bandit-report
           path: bandit-report.html
 
-dependency-check:
-  needs: version-control-and-ci
-  runs-on: ubuntu-latest
+  dependency-check:
+    needs: version-control-and-ci
+    runs-on: ubuntu-latest
 
-  steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Install OWASP Dependency Check
-      run: |
-        wget https://github.com/jeremylong/DependencyCheck/releases/download/v10.0.4/dependency-check-10.0.4-release.zip
-        unzip dependency-check-10.0.4-release.zip
-        sudo mv dependency-check/bin/dependency-check.sh /usr/local/bin/dependency-check
+      - name: Install OWASP Dependency Check
+        run: |
+          wget https://github.com/jeremylong/DependencyCheck/releases/download/v10.0.4/dependency-check-10.0.4-release.zip
+          unzip dependency-check-10.0.4-release.zip
+          sudo mv dependency-check/bin/dependency-check.sh /usr/local/bin/dependency-check
 
-    - name: Run OWASP Dependency Check
-      run: |
-        dependency-check --project "Task-Manager-using-Flask" --scan . --out ./report --format ALL || true
+      - name: Run OWASP Dependency Check
+        run: |
+          dependency-check --project "Task-Manager-using-Flask" --scan . --out ./report --format ALL || true
 
-    - name: List report files
-      run: |
-        ls -l ./report
+      - name: List report files
+        run: |
+          ls -l ./report
 
-    - name: Upload OWASP Dependency Check report
-      uses: actions/upload-artifact@v3
-      with:
-        name: dependency-check-report
-        path: ./report/*
+      - name: Upload OWASP Dependency Check report
+        uses: actions/upload-artifact@v3
+        with:
+          name: dependency-check-report
+          path: ./report/*
