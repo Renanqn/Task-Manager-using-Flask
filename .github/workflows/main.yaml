@@ -122,3 +122,19 @@ jobs:
         with:
           name: dependency-check-report
           path: dependency-check-report.html
+
+  nikto_scan:
+    needs: version-control-and-ci
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install Nikto
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y nikto
+
+      - name: Run Nikto scan
+        run: |
+          nikto -host http://127.0.0.1:5000 -o nikto_report.html
