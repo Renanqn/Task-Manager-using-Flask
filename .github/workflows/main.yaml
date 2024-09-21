@@ -151,7 +151,7 @@ jobs:
 
       - name: Run Nikto scan
         run: |
-          nikto -host http://127.0.0.1:5000 -o ${{ github.workspace }}/nikto_report.html
+          nikto -host http://192.168.100.4:5000 -o ${{ github.workspace }}/nikto_report.html
 
       - name: List files
         run: |
