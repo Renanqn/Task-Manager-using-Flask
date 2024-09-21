@@ -57,9 +57,9 @@ jobs:
 
       - name: Run unit tests
         env:
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}  # Adicionando a variável de ambiente SECRET_KEY
-          PASSWORD: ${{ secrets.PASSWORD }}        # Adicionando a variável de ambiente PASSWORD
-          NEW_PASSWORD: ${{ secrets.NEW_PASSWORD }} # Adicionando a variável de ambiente NEW_PASSWORD
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+          NEW_PASSWORD: ${{ secrets.NEW_PASSWORD }}
         run: |
           python -m unittest discover -s test -p '*_test.py'
 
@@ -123,13 +123,33 @@ jobs:
           name: dependency-check-report
           path: dependency-check-report.html
 
-  zap_scan:
+  start_app:
     needs: version-control-and-ci
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Start application
+        run: |
+          nohup python run.py &
+
+  zap_scan:
+    needs: [version-control-and-ci, start_app]
+    runs-on: ubuntu-latest
     env:
-      SECRET_KEY: ${{ secrets.SECRET_KEY }}  # Adicionando a variável de ambiente SECRET_KEY
-      PASSWORD: ${{ secrets.PASSWORD }}        # Adicionando a variável de ambiente PASSWORD
-      NEW_PASSWORD: ${{ secrets.NEW_PASSWORD }} # Adicionando a variável de ambiente NEW_PASSWORD
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      PASSWORD: ${{ secrets.PASSWORD }}
+      NEW_PASSWORD: ${{ secrets.NEW_PASSWORD }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
