@@ -2,7 +2,7 @@ import unittest
 import os
 from dotenv import load_dotenv
 from todo_project import app, db
-from todo_project.models import User, Task  # Adjust the import path as needed
+from todo_project.models import User, Task  # Ajuste o caminho de importação conforme necessário
 
 # Carregue variáveis de ambiente do arquivo .env
 load_dotenv()
@@ -10,11 +10,12 @@ load_dotenv()
 class TestTodoModels(unittest.TestCase):
 
     def setUp(self):
-        # Set up the Flask app for testing
+        # Configura o Flask app para testes
         app.config['TESTING'] = True
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'  # Use in-memory SQLite database for testing
+        app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'default_secret_key')  # Use a variável de ambiente para o SECRET_KEY
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'  # Use banco de dados SQLite em memória para testes
 
-        # Create an application context
+        # Cria um contexto de aplicação
         self.app_context = app.app_context()
         self.app_context.push()
 
@@ -22,26 +23,26 @@ class TestTodoModels(unittest.TestCase):
         db.create_all()
 
     def tearDown(self):
-        # Clean up after each test
+        # Limpa após cada teste
         db.session.remove()
         db.drop_all()
-        self.app_context.pop()  # Pop the application context
+        self.app_context.pop()  # Pop do contexto da aplicação
 
     def test_user_creation(self):
-        # Test user creation
-        user = User(username='testuser', password=os.getenv('PASSWORD'))
+        # Testa a criação de usuário
+        user = User(username='testuser', password=os.getenv('PASSWORD', 'default_password'))  # Use variável de ambiente para a senha
         db.session.add(user)
         db.session.commit()
 
-        # Retrieve user from the database
+        # Recupera o usuário do banco de dados
         retrieved_user = User.query.filter_by(username='testuser').first()
         self.assertIsNotNone(retrieved_user)
         self.assertEqual(retrieved_user.username, 'testuser')
-        self.assertEqual(retrieved_user.password, os.getenv('PASSWORD'))
+        self.assertEqual(retrieved_user.password, os.getenv('PASSWORD', 'default_password'))  # Confere a senha usando a variável de ambiente
     
     def test_task_creation(self):
-        # Create a user and a task associated with that user
-        user = User(username='testuser', password=os.getenv('PASSWORD'))
+        # Cria um usuário e uma tarefa associada a esse usuário
+        user = User(username='testuser', password=os.getenv('PASSWORD', 'default_password'))
         db.session.add(user)
         db.session.commit()
 
@@ -49,15 +50,15 @@ class TestTodoModels(unittest.TestCase):
         db.session.add(task)
         db.session.commit()
 
-        # Retrieve task from the database
+        # Recupera a tarefa do banco de dados
         retrieved_task = Task.query.filter_by(content='Test Task').first()
         self.assertIsNotNone(retrieved_task)
         self.assertEqual(retrieved_task.content, 'Test Task')
         self.assertEqual(retrieved_task.author.username, 'testuser')
 
     def test_load_user(self):
-        # Test the user loader function
-        user = User(username='testuser', password=os.getenv('PASSWORD'))
+        # Testa a função de carregar usuário
+        user = User(username='testuser', password=os.getenv('PASSWORD', 'default_password'))
         db.session.add(user)
         db.session.commit()
 

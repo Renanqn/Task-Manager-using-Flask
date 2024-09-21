@@ -129,10 +129,9 @@ class TestViews(unittest.TestCase):
         # Test changing user password
         self.login('testuser', os.getenv('PASSWORD'))
         response = self.client.post('/account/change_password', data=dict(
-        old_password=os.getenv('PASSWORD'),
-        new_password=os.getenv('NEW_PASSWORD')
+            old_password=os.getenv('PASSWORD'),
+            new_password=os.getenv('NEW_PASSWORD')
         ), follow_redirects=True)
-
 
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Password Changed Successfully', response.data)
