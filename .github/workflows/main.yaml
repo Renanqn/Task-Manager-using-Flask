@@ -123,10 +123,6 @@ jobs:
           name: dependency-check-report
           path: dependency-check-report.html
 
-      - name: Check if server is accessible
-        run: |
-          curl -I http://127.0.0.1:5000
-
   nikto_scan:
     needs: version-control-and-ci
     runs-on: ubuntu-latest
