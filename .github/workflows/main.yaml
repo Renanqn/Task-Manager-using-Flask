@@ -135,6 +135,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y nikto
 
-      - name: Run Nikto scan
-        run: |
-          nikto -host http://127.0.0.1:5000 -o nikto_report.html
+          - name: Run Nikto scan
+          run: |
+            nikto -host http://127.0.0.1:5000 -o ${{ github.workspace }}/nikto_report.html        
