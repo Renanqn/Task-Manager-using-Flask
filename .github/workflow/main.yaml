@@ -95,6 +95,7 @@ jobs:
           name: bandit-report
           path: bandit-report.html
 
+
   dependency-check:
   needs: version-control-and-ci
   runs-on: ubuntu-latest
