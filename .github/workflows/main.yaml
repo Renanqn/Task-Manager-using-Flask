@@ -139,9 +139,11 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      - name: Start application
-        run: |
-          nohup python run.py &
+          - name: Start application
+          run: |
+            cd todo_project
+            nohup python run.py &
+  
 
           zap_scan:
             needs: [version-control-and-ci, start_app]
