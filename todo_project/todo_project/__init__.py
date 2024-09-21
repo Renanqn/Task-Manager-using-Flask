@@ -17,10 +17,8 @@ app = Flask(__name__)
 # Configura o banco de dados usando SQLite
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'site.db')
 
-# Carrega o SECRET_KEY da variável de ambiente, lança um erro se não estiver definida
+# Carrega o SECRET_KEY da variável de ambiente
 secret_key = os.getenv('SECRET_KEY')
-if not secret_key:
-    raise ValueError("SECRET_KEY is not set in environment variables.")
 app.config['SECRET_KEY'] = secret_key
 
 # Inicializa o SQLAlchemy com a aplicação

@@ -55,7 +55,7 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      - name: Run unit test
+      - name: Run unit tests
         env:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}  # Adicionando a variável de ambiente SECRET_KEY
           PASSWORD: ${{ secrets.PASSWORD }}        # Adicionando a variável de ambiente PASSWORD
@@ -123,3 +123,19 @@ jobs:
           name: dependency-check-report
           path: dependency-check-report.html
 
+  zap_scan:
+    needs: version-control-and-ci
+    runs-on: ubuntu-latest
+    env:
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}  # Adicionando a variável de ambiente SECRET_KEY
+      PASSWORD: ${{ secrets.PASSWORD }}        # Adicionando a variável de ambiente PASSWORD
+      NEW_PASSWORD: ${{ secrets.NEW_PASSWORD }} # Adicionando a variável de ambiente NEW_PASSWORD
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        
+      - name: Run ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.4.0
+        with:
+          target: 'http://127.0.0.1:5000'
+          fail_action: true
