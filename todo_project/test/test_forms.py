@@ -1,9 +1,14 @@
 import unittest
+import os
 from flask import Flask
 from flask_login import LoginManager, login_user, logout_user
+from dotenv import load_dotenv
 from todo_project import db
 from todo_project.models import User
 from todo_project.forms import RegistrationForm, LoginForm, UpdateUserInfoForm, UpdateUserPassword, TaskForm, UpdateTaskForm
+
+# Carregue variáveis de ambiente do arquivo .env
+load_dotenv()
 
 class TestForms(unittest.TestCase):
 
@@ -11,7 +16,7 @@ class TestForms(unittest.TestCase):
         # Set up a basic Flask app and in-memory SQLite database
         self.app = Flask(__name__)
         self.app.config['TESTING'] = True
-        self.app.config['SECRET_KEY'] = 'test_secret_key'  # Required for Flask-Login
+        self.app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')  # Use variável de ambiente
         self.app.config['WTF_CSRF_ENABLED'] = False  # Disable CSRF for testing
         self.app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
 
@@ -31,26 +36,26 @@ class TestForms(unittest.TestCase):
 
     def test_registration_form(self):
         # Create a registration form with valid data
-        form = RegistrationForm(username='testuser', password='password123', confirm_password='password123')
+        form = RegistrationForm(username='testuser', password=os.getenv('PASSWORD'), confirm_password=os.getenv('PASSWORD'))
         self.assertTrue(form.validate())
 
         # Create a user in the database
-        user = User(username='testuser', password='password123')
+        user = User(username='testuser', password=os.getenv('PASSWORD'))
         db.session.add(user)
         db.session.commit()
 
         # Check if the form raises a validation error for existing username
-        form = RegistrationForm(username='testuser', password='password123', confirm_password='password123')
+        form = RegistrationForm(username='testuser', password=os.getenv('PASSWORD'), confirm_password=os.getenv('PASSWORD'))
         self.assertFalse(form.validate())
 
     def test_login_form(self):
         # Create a login form with valid data
-        form = LoginForm(username='testuser', password='password123')
+        form = LoginForm(username='testuser', password=os.getenv('PASSWORD'))
         self.assertTrue(form.validate())
 
     def test_update_user_info_form(self):
         # Simulate a logged-in user
-        user = User(username='testuser', password='password123')
+        user = User(username='testuser', password=os.getenv('PASSWORD'))
         db.session.add(user)
         db.session.commit()
         with self.app.test_request_context():
@@ -68,7 +73,7 @@ class TestForms(unittest.TestCase):
 
     def test_update_user_password_form(self):
         # Create a form for changing password
-        form = UpdateUserPassword(old_password='oldpass', new_password='newpass')
+        form = UpdateUserPassword(old_password=os.getenv('OLD_PASSWORD'), new_password=os.getenv('NEW_PASSWORD'))
         self.assertTrue(form.validate())
 
     def test_task_form(self):

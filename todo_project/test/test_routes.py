@@ -1,6 +1,11 @@
 import unittest
+import os
+from dotenv import load_dotenv
 from todo_project import app, db, bcrypt
 from todo_project.models import User, Task
+
+# Carregue variáveis de ambiente do arquivo .env
+load_dotenv()
 
 class TestViews(unittest.TestCase):
 
@@ -9,7 +14,7 @@ class TestViews(unittest.TestCase):
         """Set up a testing Flask application and in-memory SQLite database."""
         app.config['TESTING'] = True
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
-        app.config['SECRET_KEY'] = 'test_secret_key'  # Required for Flask-Login
+        app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')  # Use environment variable for SECRET_KEY
         app.config['WTF_CSRF_ENABLED'] = False  # Disable CSRF for testing
         cls.app = app
 
@@ -21,7 +26,7 @@ class TestViews(unittest.TestCase):
         self.client = self.app.test_client()
 
         # Create a test user
-        self.test_user = User(username='testuser', password=bcrypt.generate_password_hash('password123').decode('utf-8'))
+        self.test_user = User(username='testuser', password=bcrypt.generate_password_hash(os.getenv('PASSWORD')).decode('utf-8'))
         db.session.add(self.test_user)
         db.session.commit()
 
@@ -51,8 +56,8 @@ class TestViews(unittest.TestCase):
         # Test user registration
         response = self.client.post('/register', data=dict(
             username='newuser',
-            password='password123',
-            confirm_password='password123'
+            password=os.getenv('PASSWORD'),
+            confirm_password=os.getenv('PASSWORD')
         ), follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
@@ -62,7 +67,7 @@ class TestViews(unittest.TestCase):
 
     def test_login(self):
         # Test login functionality
-        response = self.login('testuser', 'password123')
+        response = self.login('testuser', os.getenv('PASSWORD'))
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Login Successfull', response.data)
 
@@ -74,14 +79,14 @@ class TestViews(unittest.TestCase):
 
     def test_logout(self):
         # Test logout functionality
-        self.login('testuser', 'password123')
+        self.login('testuser', os.getenv('PASSWORD'))
         response = self.logout()
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Login', response.data)
 
     def test_add_task(self):
         # Test adding a new task
-        self.login('testuser', 'password123')
+        self.login('testuser', os.getenv('PASSWORD'))
         response = self.client.post('/add_task', data=dict(
             task_name='Test Task'
         ), follow_redirects=True)
@@ -93,7 +98,7 @@ class TestViews(unittest.TestCase):
 
     def test_update_task(self):
         # Test updating an existing task
-        self.login('testuser', 'password123')
+        self.login('testuser', os.getenv('PASSWORD'))
         task = Task(content='Initial Task', author=self.test_user)
         db.session.add(task)
         db.session.commit()
@@ -109,7 +114,7 @@ class TestViews(unittest.TestCase):
 
     def test_delete_task(self):
         # Test deleting a task
-        self.login('testuser', 'password123')
+        self.login('testuser', os.getenv('PASSWORD'))
         task = Task(content='Task to Delete', author=self.test_user)
         db.session.add(task)
         db.session.commit()
@@ -122,11 +127,12 @@ class TestViews(unittest.TestCase):
 
     def test_change_password(self):
         # Test changing user password
-        self.login('testuser', 'password123')
+        self.login('testuser', os.getenv('PASSWORD'))
         response = self.client.post('/account/change_password', data=dict(
-            old_password='password123',
-            new_password='newpassword'
+        old_password=os.getenv('PASSWORD'),
+        new_password=os.getenv('NEW_PASSWORD')
         ), follow_redirects=True)
+
 
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Password Changed Successfully', response.data)

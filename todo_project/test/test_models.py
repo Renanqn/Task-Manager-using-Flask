@@ -1,6 +1,11 @@
 import unittest
+import os
+from dotenv import load_dotenv
 from todo_project import app, db
 from todo_project.models import User, Task  # Adjust the import path as needed
+
+# Carregue variáveis de ambiente do arquivo .env
+load_dotenv()
 
 class TestTodoModels(unittest.TestCase):
 
@@ -24,7 +29,7 @@ class TestTodoModels(unittest.TestCase):
 
     def test_user_creation(self):
         # Test user creation
-        user = User(username='testuser', password='password123')
+        user = User(username='testuser', password=os.getenv('PASSWORD'))
         db.session.add(user)
         db.session.commit()
 
@@ -32,11 +37,11 @@ class TestTodoModels(unittest.TestCase):
         retrieved_user = User.query.filter_by(username='testuser').first()
         self.assertIsNotNone(retrieved_user)
         self.assertEqual(retrieved_user.username, 'testuser')
-        self.assertEqual(retrieved_user.password, 'password123')
+        self.assertEqual(retrieved_user.password, os.getenv('PASSWORD'))
     
     def test_task_creation(self):
         # Create a user and a task associated with that user
-        user = User(username='testuser', password='password123')
+        user = User(username='testuser', password=os.getenv('PASSWORD'))
         db.session.add(user)
         db.session.commit()
 
@@ -52,7 +57,7 @@ class TestTodoModels(unittest.TestCase):
 
     def test_load_user(self):
         # Test the user loader function
-        user = User(username='testuser', password='password123')
+        user = User(username='testuser', password=os.getenv('PASSWORD'))
         db.session.add(user)
         db.session.commit()
 
