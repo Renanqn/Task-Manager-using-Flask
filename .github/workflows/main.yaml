@@ -56,6 +56,8 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run unit test
+        env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}  # Adicionando a variável de ambiente SECRET_KEY
         run: |
           python -m unittest discover -s test -p '*_test.py'
 
