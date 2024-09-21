@@ -134,15 +134,22 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        
-      - name: Adjust permissions
-        run: |
-          sudo chmod -R 777 /zap/wrk/
-        
-      - name: ZAP Scan
+
+      - name: Run ZAP Baseline Scan
         uses: zaproxy/action-baseline@v0.12.0
         with:
           docker_name: 'ghcr.io/zaproxy/zaproxy:stable'
           target: 'http://192.168.100.4:5000'
           cmd_options: '-a'
-        
+          rules_file_name: '.zap/rules.tsv'
+
+      - name: List ZAP reports
+        run: |
+          ls -l
+          ls -l /zap/wrk || echo "Report directory does not exist"
+
+      - name: Upload ZAP HTML Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: zap-report
+          path: /zap/wrk/report_html.html
