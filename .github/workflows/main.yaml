@@ -123,6 +123,7 @@ jobs:
           name: dependency-check-report
           path: dependency-check-report.html
 
+
   nikto_scan:
     needs: version-control-and-ci
     runs-on: ubuntu-latest
@@ -130,10 +131,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Start Flask application
+        run: |
+          nohup python run.py &
+
       - name: Install Nikto
         run: |
           sudo apt-get update
           sudo apt-get install -y nikto
+
+      - name: Wait for application to be ready
+        run: |
+          sleep 10  # Aumente o tempo se necessário
 
       - name: Run Nikto scan
         run: |
@@ -148,4 +162,3 @@ jobs:
         with:
           name: nikto-report
           path: nikto_report.html
-     
