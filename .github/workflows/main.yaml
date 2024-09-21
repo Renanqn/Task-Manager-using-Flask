@@ -111,14 +111,19 @@ jobs:
 
       - name: Run OWASP Dependency Check
         run: |
-          dependency-check --project "Task-Manager-using-Flask" --scan . --out ./report --format ALL || true
+          dependency-check --project "Task-Manager-using-Flask" --scan . --out ./report || true
 
-      - name: List report files
+      - name: List current directory
         run: |
-          ls -l ./report
+          ls -l
+
+      - name: List report directory
+        run: |
+          ls -l ./report || echo "Report directory does not exist"
 
       - name: Upload OWASP Dependency Check report
         uses: actions/upload-artifact@v3
         with:
           name: dependency-check-report
-          path: ./report/*
+          path: ./report/dependency-check-report.html
+
