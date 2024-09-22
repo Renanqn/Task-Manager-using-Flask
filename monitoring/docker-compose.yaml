@@ -1,0 +1,17 @@
+monitoring:
+  runs-on: ubuntu-latest
+  needs: deploy-stage
+  steps:
+    - name: Start Prometheus
+      run: |
+        docker run -d \
+          --name prometheus \
+          -p 9090:9090 \
+          -v ~/prometheus.yml:/etc/prometheus/prometheus.yml \
+          prom/prometheus
+
+    - name: Verify Prometheus Status
+      run: |
+        sleep 10
+        curl -f http://localhost:9090/metrics
+
