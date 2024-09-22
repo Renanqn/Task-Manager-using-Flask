@@ -26,7 +26,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-  compile:
+  build:
     needs: version-control-and-ci
     runs-on: ubuntu-latest
 
@@ -95,48 +95,39 @@ jobs:
           name: bandit-report
           path: bandit-report.html
 
-  dependency-check:
-    needs: version-control-and-ci
+  dependency_check:
+    needs: build
     runs-on: ubuntu-latest
-
+    name: Dependency-Check
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Install OWASP Dependency Check
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.x"
+      - name: Install dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y unzip default-jdk
-          wget https://github.com/jeremylong/DependencyCheck/releases/download/v10.0.4/dependency-check-10.0.4-release.zip
-          unzip dependency-check-10.0.4-release.zip
-          sudo mv dependency-check/bin/dependency-check.sh /usr/local/bin/dependency-check
-          chmod +x /usr/local/bin/dependency-check
-
-      - name: Run OWASP Dependency Check
-        run: |
-          mkdir -p report
-          dependency-check --project "Task-Manager-using-Flask" --scan . --out report -v
-          
-      - name: List current directory
-        run: ls -l
-
-      - name: List report directory
-        run: ls -l ./report
-
-      - name: Verify report files
-        run: |
-          if [ -f report/dependency-check-report.html ]; then
-            echo "HTML report generated successfully."
-          else
-            echo "HTML report not found."
-            exit 1
-          fi
-
-      - name: Upload OWASP Dependency Check reports
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Dependency-Check
+        uses: dependency-check/Dependency-Check_Action@main
+        id: Dependency-Check
+        with:
+          project: "Task-Manager-using-Flask"
+          path: "."
+          format: "HTML"
+          out: "reports"
+          args: >
+            --scan "**/*.py"
+            --scan "requirements.txt"
+            --failOnCVSS 7
+            --enableRetired
+      - name: Upload Dependency-Check results
         uses: actions/upload-artifact@v3
         with:
-          name: dependency-check-report
-          path: report/dependency-check-report.*  # Certifique-se que esse caminho está correto
+          name: Dependency-Check report
+          path: ${{ github.workspace }}/reports
 
   review:
     runs-on: ubuntu-latest
@@ -181,32 +172,30 @@ jobs:
         run: |
           docker run -d --name Task-Manager-using-Flask -p 5000:5000 Task-Manager-using-Flask || true
 
-
   post-deployment-monitoring:
-      runs-on: ubuntu-latest
-      steps:
-        - name: Sample Step
-          run: echo "This is the post-deployment monitoring job."
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sample Step
+        run: echo "This is the post-deployment monitoring job."
 
   grafana:
-      runs-on: ubuntu-latest
-      needs: post-deployment-monitoring  # Certifique-se de que este nome corresponde a um job existente
-      steps:
-        - name: Install Grafana
-          run: |
-            echo "Instalando Grafana"
-            wget https://dl.grafana.com/oss/release/grafana_9.5.0_amd64.deb
-            sudo dpkg -i grafana_9.5.0_amd64.deb
+    runs-on: ubuntu-latest
+    needs: post-deployment-monitoring
+    steps:
+      - name: Install Grafana
+        run: |
+          echo "Instalando Grafana"
+          wget https://dl.grafana.com/oss/release/grafana_9.5.0_amd64.deb
+          sudo dpkg -i grafana_9.5.0_amd64.deb
 
-        - name: Start Grafana
-          run: |
-            echo "Iniciando Grafana"
-            sudo systemctl daemon-reload
-            sudo systemctl enable grafana-server
-            sudo systemctl start grafana-server
+      - name: Start Grafana
+        run: |
+          echo "Iniciando Grafana"
+          sudo systemctl daemon-reload
+          sudo systemctl enable grafana-server
+          sudo systemctl start grafana-server
 
-        - name: Configure Grafana
-          run: |
-            echo "Configurando Grafana"
-            # Adicione comandos para configurar o Grafana, como adicionar datasources via API
-
+      - name: Configure Grafana
+        run: |
+          echo "Configurando Grafana"
+          # Adicione comandos para configurar o Grafana, como adicionar datasources via API
