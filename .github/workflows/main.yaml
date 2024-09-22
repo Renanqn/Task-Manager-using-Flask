@@ -151,8 +151,8 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t task-Manager-using-flask .
+          docker build -t Task-Manager-using-Flask .
 
       - name: Deploy to Staging
         run: |
-          docker run -d --name task-Manager-using-flask -p 5000:5000 task-Manager-using-flask || true
+          docker run -d --name Task-Manager-using-Flask -p 5000:5000 Task-Manager-using-Flask || true
