@@ -128,6 +128,20 @@ jobs:
           name: dependency-check-report
           path: report/*
 
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Build Docker Image for Review
+        run: |
+          docker build -t task-manager-app:review .
+
+      - name: Deploy to Review Environment
+        run: |
+          docker run -d --name task-manager-review -p 5001:5000 task-manager-app:review
+
   security-testing:
     runs-on: ubuntu-latest
     steps:
