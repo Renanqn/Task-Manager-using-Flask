@@ -122,8 +122,8 @@ jobs:
         run: |
           ls -l ./report || echo "Report directory does not exist"
 
-      - name: Upload OWASP Dependency Check report
+      - name: Upload OWASP Dependency Check reports
         uses: actions/upload-artifact@v3
         with:
           name: dependency-check-report
-          path: report/dependency-check-report.html
+          path: report/*
