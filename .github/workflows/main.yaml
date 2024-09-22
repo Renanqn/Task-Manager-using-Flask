@@ -120,7 +120,7 @@ jobs:
 
       - name: List report directory
         run: |
-          ls -l ./report || echo "Report directory does not exist"
+          ls -l ./report
 
       - name: Upload OWASP Dependency Check reports
         uses: actions/upload-artifact@v3
@@ -142,3 +142,17 @@ jobs:
       - name: Run OWASP ZAP Security Scan
         run: |
           docker run -t --rm zaproxy/zap-stable zap.sh -quickurl http://localhost:5000 -quickout zap_report.html || true
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Build Docker Image
+        run: |
+          docker build -t task-Manager-using-flask .
+
+      - name: Deploy to Staging
+        run: |
+          docker run -d --name task-Manager-using-flask -p 5000:5000 task-Manager-using-flask || true
