@@ -128,19 +128,18 @@ jobs:
           name: dependency-check-report
           path: report/*
 
-          Segurança OWasp
-jobs:
+
   security-testing:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout Code
+          uses: actions/checkout@v3
 
-      - name: Deploy to Staging
-        run: |
-          docker build -t task-manager-app .
-          docker run -d --name task-manager-staging -p 5000:5000 task-manager-app
+        - name: Deploy to Staging
+          run: |
+            docker build -t task-manager-app .
+            docker run -d --name task-manager-staging -p 5000:5000 task-manager-app
 
-      - name: Run OWASP ZAP Security Scan
-        run: |
-          docker run -t --rm zaproxy/zap-stable zap.sh -quickurl http://localhost:5000 -quickout zap_report.html
+        - name: Run OWASP ZAP Security Scan
+          run: |
+            docker run -t --rm zaproxy/zap-stable zap.sh -quickurl http://localhost:5000 -quickout zap_report.html
